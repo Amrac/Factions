@@ -1,5 +1,8 @@
 package com.massivecraft.factions;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -64,7 +67,11 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator
 	
 	// FIELD: power
 	private double power;
-
+	
+	//MODIF
+	// FIELD: powerMax
+	private double powerMax;
+	
 	// FIELD: powerBoost
 	// special increase/decrease to min and max power for this player
 	private double powerBoost;
@@ -468,9 +475,32 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator
 			this.power = this.getPowerMin();
 	}
 	
-	public double getPowerMax()
-	{
-		return Conf.powerPlayerMax + this.powerBoost;
+
+	//MODIF
+	public void alterPowerMax(double delta) {
+		String pilote = "com.mysql.jdbc.Driver";
+		try {
+			Class.forName(pilote);
+			Connection connexion = DriverManager.getConnection("jdbc:mysql://"+Conf.bddHost+"/"+Conf.bddName,Conf.bddName,Conf.bddPassword);
+			Statement instruction = connexion.createStatement();
+			instruction.executeUpdate("update faction set power=`power`+"+ (int)delta+" where username='"+this.getName()+"'");
+			connexion.close();
+			this.powerMax += delta;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			sendMessage("Erreur SQL"+e);
+		}
+		
+	}
+	
+	//MODIF
+	public void setPowerMax(double valeur) {
+		this.powerMax = valeur;
+	}
+	
+	//MODIF
+	public double getPowerMax() {
+		return this.powerMax+Conf.powerPlayerMax+ this.powerBoost;
 	}
 	
 	public double getPowerMin()

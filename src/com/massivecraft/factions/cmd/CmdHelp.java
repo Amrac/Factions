@@ -69,6 +69,7 @@ public class CmdHelp extends FCommand
 		pageLines.add( p.cmdBase.cmdLeave.getUseageTemplate(true) );
 		pageLines.add( p.cmdBase.cmdChat.getUseageTemplate(true) );
 		pageLines.add( p.cmdBase.cmdHome.getUseageTemplate(true) );
+		pageLines.add(p.cmdBase.cmdBuyPower.getUseageTemplate(true) );//MODIF
 		pageLines.add( p.txt.parse("<i>Learn how to create a faction on the next page.") );
 		helpPages.add(pageLines);
 		

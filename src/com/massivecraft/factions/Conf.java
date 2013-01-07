@@ -10,6 +10,11 @@ public class Conf
 	public static List<String> baseCommandAliases = new ArrayList<String>();
 	public static boolean allowNoSlashCommand = true;
 	
+	//BDD //MODIF
+	public static String bddHost = "";
+	public static String bddName = "";
+	public static String bddPassword = "";
+	
 	// Colors
 	public static ChatColor colorMember = ChatColor.GREEN;
 	public static ChatColor colorAlly = ChatColor.LIGHT_PURPLE;

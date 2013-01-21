@@ -92,19 +92,7 @@ public class CmdDisband extends FCommand
 		if (Conf.logFactionDisband)
 			P.p.log("The faction "+faction.getTag()+" ("+faction.getId()+") was disbanded by "+(senderIsConsole ? "console command" : fme.getName())+".");
 
-		if (Econ.shouldBeUsed() && ! senderIsConsole)
-		{
-			//Give all the faction's money to the disbander
-			double amount = Econ.getBalance(faction.getAccountId());
-			Econ.transferMoney(fme, faction, fme, amount, false);
-			
-			if (amount > 0.0)
-			{
-				String amountString = Econ.moneyString(amount);
-				msg("<i>You have been given the disbanded faction's bank, totaling %s.", amountString);
-				P.p.log(fme.getName() + " has been given bank holdings of "+amountString+" from disbanding "+faction.getTag()+".");
-			}
-		}		
+		//Modif - Supression du gain d'argent en disband	
 		
 		faction.detach();
 

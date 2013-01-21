@@ -1,5 +1,11 @@
 package com.massivecraft.factions.listeners;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -30,6 +36,7 @@ import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.P;
+import com.massivecraft.factions.integration.Econ;
 import com.massivecraft.factions.integration.SpoutFeatures;
 import com.massivecraft.factions.struct.Permission;
 import com.massivecraft.factions.struct.Relation;
@@ -59,6 +66,64 @@ public class FactionsPlayerListener implements Listener
 		if ( ! SpoutFeatures.updateTerritoryDisplay(me))
 			me.sendFactionHereMessage();
 
+		//MODIF
+		Date maDateAvecFormat=new Date();
+		SimpleDateFormat dateStandard = new SimpleDateFormat("dd/MM/yyyy");
+		
+		
+		//me.sendMessage("Bienvenue "+me.getName()+"! il est "+ System.currentTimeMillis()+" ou "+dateStandard.format(maDateAvecFormat) );
+		String pilote = "com.mysql.jdbc.Driver";
+		try{
+			Class.forName(pilote);
+			Connection connexion = DriverManager.getConnection("jdbc:mysql://"+Conf.bddHost+"/"+Conf.bddName,Conf.bddName,Conf.bddPassword);
+			Statement instruction = connexion.createStatement();
+			//me.sendMessage("SELECT * FROM faction");
+			ResultSet resultat = instruction.executeQuery("SELECT * FROM faction where username='"+me.getName()+"'");
+
+			boolean flag = false;
+			while(resultat.next()){
+				flag = true;
+
+				
+				if(me.getPowerMax()>resultat.getInt("power"))//Cas ou un achat de power à était fait alors que la connexion SQL était HS.
+				{//A virer a la prochaine mise a jour
+					Statement instructionUpdate = connexion.createStatement();
+					instructionUpdate.executeUpdate("update faction set power="+ (int)me.getPowerMax()+"  where username='"+me.getName()+"' ");
+				}
+				else
+					me.setPowerMax(resultat.getInt("power"));
+				Date dateDerniereConnection=new Date(resultat.getLong("derniereConnection"));
+				
+				//Check supplémentaire, au cas ou un serveur est à la mauvaise date, on pas de MAJ ni de sousous)
+				if(System.currentTimeMillis() > resultat.getLong("derniereConnection"))
+				{
+					if( dateStandard.format(dateDerniereConnection).equals(dateStandard.format(maDateAvecFormat)))
+					{
+					//	me.sendMessage("RE bonjour ! :-) "+dateStandard.format(dateDerniereConnection) +"  "+ dateStandard.format(maDateAvecFormat));
+					}
+					else
+					{
+					//	me.sendMessage("Nouveau jour?"+dateStandard.format(dateDerniereConnection) +"  "+ dateStandard.format(maDateAvecFormat));//Ajouter 5PO.
+						Econ.modifyMoney(me, +5, "toDoThis", " pour vous être connecté aujourd'hui! :-)");
+					}
+					Statement instructionUpdate = connexion.createStatement();
+					instructionUpdate.executeUpdate("update faction set derniereConnection="+ System.currentTimeMillis()+"  where username='"+me.getName()+"' ");
+				}
+			}
+			if(!flag)
+			{
+				me.sendMessage(resultat.getFetchSize()+" Absent de la base de données. Ajout de "+me.getName());
+				Statement instructionUpdate = connexion.createStatement();
+				instructionUpdate.executeUpdate("insert into faction (username,power,derniereConnection) values('"+me.getName()+"','0',"+ System.currentTimeMillis()+")");
+			}
+			connexion.close();
+		}
+		catch (Exception e){
+
+			p.log("echec  : "+e);
+		}
+		//FIN MODIF
+		
 		SpoutFeatures.updateAppearancesShortly(event.getPlayer());
 	}
 	

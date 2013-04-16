@@ -85,13 +85,13 @@ public class FactionsPlayerListener implements Listener
 				flag = true;
 
 				
-				if(me.getPowerMax()>resultat.getInt("power"))//Cas ou un achat de power à était fait alors que la connexion SQL était HS.
-				{//A virer a la prochaine mise a jour
-					Statement instructionUpdate = connexion.createStatement();
-					instructionUpdate.executeUpdate("update faction set power="+ (int)me.getPowerMax()+"  where username='"+me.getName()+"' ");
-				}
-				else
+				if(Conf.buyPowerMax == true)
+				{
 					me.setPowerMax(resultat.getInt("power"));
+				} 
+				else me.setPowerMax(0);
+				
+				
 				Date dateDerniereConnection=new Date(resultat.getLong("derniereConnection"));
 				
 				//Check supplémentaire, au cas ou un serveur est à la mauvaise date, on pas de MAJ ni de sousous)

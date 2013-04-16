@@ -10,6 +10,9 @@ public class Conf
 	public static List<String> baseCommandAliases = new ArrayList<String>();
 	public static boolean allowNoSlashCommand = true;
 	
+	//POWER //MODIF
+	public static boolean buyPowerMax = true;
+	
 	//BDD //MODIF
 	public static String bddHost = "";
 	public static String bddName = "";
